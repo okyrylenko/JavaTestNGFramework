@@ -1,0 +1,20 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="ExecuteAllProd" verbose="1" parallel="methods" thread-count="7" >
+    <parameter name="Env" value="Production"></parameter>
+    <test name="Production-Chrome" >
+        <parameter name="Browser" value="Chrome"/>
+        <classes>
+            <class name="LogIn" />
+            <class name="LogInFail"></class>
+        </classes>
+    </test>
+
+    <test name="Production-FireFox" >
+        <parameter name="Browser" value="Firefox"></parameter>
+        <classes>
+            <class name="LogIn" />
+            <class name="LogInFail"></class>
+        </classes>
+    </test>
+</suite>
