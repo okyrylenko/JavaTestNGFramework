@@ -1,12 +1,11 @@
 package Foundation;
 
-import com.google.inject.Inject;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
+import java.net.URL;
 import org.openqa.selenium.WindowType;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.net.URL;
 import java.util.Set;
 
 public class Browser {
@@ -21,108 +20,113 @@ public class Browser {
     }
 
     public String getCurrentUrl() {
-        return null;
+        return driver.getCurrentUrl();
     }
 
     public String getTitle() {
-        return null;
+        return driver.getTitle();
     }
 
     public void close() {
-
+        driver.close();
     }
 
     public void quit() {
-
+        driver.quit();
     }
 
     public Set<String> getWindowHandles() {
-        return null;
+        return driver.getWindowHandles();
     }
 
     public String getWindowHandle() {
-        return null;
+        return driver.getWindowHandle();
     }
 
 
     public WebDriver.ImeHandler ime() {
-        return null;
+        return driver.manage().ime();
     }
 
     public WebDriver.Window window() {
-        return null;
+        return driver.manage().window();
     }
 
     public WebDriver.TargetLocator switchTo() {
-        return null;
+        return driver.switchTo();
     }
 
     public WebDriver.Navigation navigate() {
-        return null;
+        return driver.navigate();
     }
 
     public void deleteCookieNamed(String name) {
-
+        driver.manage().deleteCookieNamed(name);
     }
 
     public void deleteCookie(Cookie cookie) {
-
+        driver.manage().deleteCookie(cookie);
     }
 
     public void deleteAllCookies() {
-
+        driver.manage().deleteAllCookies();
     }
 
     public Set<Cookie> getCookies() {
-        return null;
+        return driver.manage().getCookies();
     }
 
     public Cookie getCookieNamed(String name) {
-        return null;
+        return driver.manage().getCookieNamed(name);
+    }
+
+    public void get(String relativeUrl){
+        navigateTo(relativeUrl);
     }
 
     public void back() {
-
+        driver.navigate().back();
     }
 
     public void forward() {
-
+        driver.navigate().forward();
     }
 
-    public void to(String url) {
-
+    public void navigateTo(String relativeUrl) {
+        String url = TestSettings.baseUrl + relativeUrl;
+        driver.navigate().to(url);
     }
 
-    public void to(URL url) {
-
+    public void navigateTo(URL url){
+        driver.navigate().to(url);
     }
 
     public void refresh() {
-
+        driver.navigate().refresh();
     }
 
-    public WebDriver frame(int index) {
-        return null;
+    public WebDriver switchToFrame(int index) {
+        return driver.switchTo().frame(index) ;
     }
 
-    public WebDriver frame(String nameOrId) {
-        return null;
+    public WebDriver switchToFrame(String nameOrId) {
+        return driver.switchTo().frame(nameOrId);
     }
 
     public WebDriver window(String nameOrHandle) {
-        return null;
+        return driver.switchTo().window(nameOrHandle);
     }
 
     public WebDriver newWindow(WindowType typeHint) {
-        return null;
+        driver.switchTo().newWindow(typeHint);
+        return driver;
     }
 
-
     public void maximize() {
-
+        driver.manage().window().maximize();
     }
 
     public void fullscreen() {
-
+        driver.manage().window().fullscreen();
     }
 }

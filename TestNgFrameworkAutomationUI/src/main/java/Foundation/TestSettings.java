@@ -12,4 +12,7 @@ public class TestSettings {
 
     @Getter @Setter
     public static Browsers browser;
+
+    @Getter @Setter
+    public static String baseUrl;
 }

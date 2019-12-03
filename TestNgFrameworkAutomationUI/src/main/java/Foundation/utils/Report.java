@@ -1,6 +1,7 @@
 package Foundation.utils;
 
 
+import Foundation.TestSettings;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.reporter.ExtentHtmlReporter;
@@ -25,7 +26,7 @@ public class Report {
     }
 
     public static void setTestName(String name){
-        test = extent.createTest(name);
+        test = extent.createTest(name + " " + TestSettings.browser);
     }
 
     public static void setResult(ITestResult result){

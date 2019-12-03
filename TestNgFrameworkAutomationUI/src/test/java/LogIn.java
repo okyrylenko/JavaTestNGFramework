@@ -1,18 +1,15 @@
 import Foundation.BaseTest;
-import Foundation.dataRepository.DataProvider;
+import Foundation.Browser;
+import Foundation.dataRepository.DataProvidersFactory;
+import Foundation.dataRepository.DataSupplier;
 import Foundation.models.Account;
+import Foundation.utils.TestNGListeners;
 import UIComponents.HomePage;
 import UIComponents.LogInPage;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 //@Guice(modules = LogInPage.class)
 public class LogIn extends BaseTest {
@@ -20,18 +17,19 @@ public class LogIn extends BaseTest {
    // @Inject
    // private LogInPage logInPage;
 
-    @Test
-    public void shouldBeAbleToLogIn() throws IOException {
+    @Test(dataProvider = DataProvidersFactory.allAccounts, dataProviderClass = DataSupplier.class, groups = {"smoke"})
+    public void shouldBeAbleToLogIn(Account[] accounts) throws IOException {
         LogInPage logInPage = new LogInPage(driver, wait);
-        driver.get("https://github.com/login");
-        logInPage.logIn(DataProvider.getAccounts().get(0));
+        Browser browser = new Browser(driver, wait);
+        browser.navigateTo("login");
+        logInPage.logIn(Arrays.asList(accounts).get(0));
     }
 
-    @Test
+    @Test(groups = {"smoke, regression"})
     public void shouldBeAbleToSearch(){
         HomePage homePage = new HomePage(driver, wait);
-
-        driver.get("https://github.com");
+        Browser browser = new Browser(driver, wait);
+        browser.navigateTo("login");
 
         homePage.header().search("Selenium");
     }

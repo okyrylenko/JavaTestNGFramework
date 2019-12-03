@@ -28,9 +28,6 @@ public class BasePage extends Browser {
     protected By locateElementByCss(String css){
         return By.cssSelector(css);
     }
-    protected void get(String url) {
-
-    }
 
     protected BasePage click(By locator) {
         findElement(locator).click();

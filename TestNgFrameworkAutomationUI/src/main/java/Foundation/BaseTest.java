@@ -9,6 +9,7 @@ import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.google.inject.Inject;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.apache.commons.io.FilenameUtils;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -17,44 +18,48 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 
 public class BaseTest {
 
     public WebDriver driver;
     public WebDriverWait wait;
+    private Properties props;
 
-    @BeforeSuite
+    @BeforeSuite(alwaysRun = true)
     @Parameters({"Env"})
-    public void beforeSuite(ITestContext context, @Optional String env)
-    {
-        TestSettings.env = env == null?Environments.valueOf("Production"):Environments.valueOf(env);
+    public void beforeSuite(ITestContext context, @Optional("Production") String env) throws IOException {
+        TestSettings.env = Environments.valueOf(env);
+        TestSettings.baseUrl = getValueForProperty(TestSettings.env+".baseUrl");
         Report.start(context.getName());
-        System.out.println("before suite");
     }
 
-    @BeforeTest
-    @Parameters({"Browser"})
-    public void beforeTest(@Optional String browser){
-        TestSettings.browser = browser ==null? Browsers.valueOf("Chrome"):Browsers.valueOf(browser);
-        System.out.println("before test");
+    @BeforeTest(alwaysRun = true)
+    public void beforeTest(){
+
     }
 
 
-    @BeforeGroups
+    @BeforeGroups(alwaysRun = true)
     public void beforeGroup(){
-        System.out.println("before group");
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void beforeClass(){
-        System.out.println("before class");
     }
 
 
-    @BeforeMethod
-    public void beforeMethod(ITestResult result){
+    @BeforeMethod(alwaysRun = true)
+    @Parameters({"Browser"})
+    public void beforeMethod(@Optional("Chrome") String browser,ITestResult result){
+        TestSettings.browser = Browsers.valueOf(browser);
+        System.out.println("opening " + TestSettings.browser +" on  thread " + Thread.currentThread().getId());
         Report.setTestName(result.getMethod().getMethodName());
-        System.out.println("before method");
         switch (TestSettings.browser){
             case Chrome:
                 WebDriverManager.chromedriver().setup();
@@ -71,30 +76,38 @@ public class BaseTest {
         driver.manage().window().maximize();
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void afterMethod(ITestResult result){
         Report.setResult(result);
-        System.out.println("after method");
         driver.quit();
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public void afterClass(){
-        System.out.println("after class");
+
     }
-    @AfterGroups
+    @AfterGroups(alwaysRun = true)
     public void afterGroup(){
-        System.out.println("after group");
+
     }
 
-    @AfterTest
+    @AfterTest(alwaysRun = true)
     public void afterTest(){
-        System.out.println("after test");
+
     }
 
-    @AfterSuite
+    @AfterSuite(alwaysRun = true)
     public void afterSuite(){
         Report.close();
-        System.out.println("after suite");
+    }
+
+    private String getValueForProperty(String propertyName) throws IOException {
+        if(props ==null) props = new Properties();
+
+        String path = FilenameUtils.separatorsToSystem(System.getProperty("user.dir")+"\\src\\main\\resources\\runConfigurations\\config.properties");
+
+        InputStream input = new FileInputStream(path);
+        props.load(input);
+        return props.getProperty(propertyName);
     }
 }
