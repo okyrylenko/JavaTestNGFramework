@@ -65,9 +65,6 @@ public class TestNGListeners implements ITestListener, ISuiteListener, IExecutio
         System.out.println("method '" + method.getTestMethod().getMethodName() + "' in '"+ context.getName()+"' finished");
     }
 
-    @Override
-    public void transform(ITestAnnotation annotation, Class testClass, Constructor testConstructor, Method testMethod) {
-        annotation.setRetryAnalyzer(Retry.class);
-    }
+
 
 }
