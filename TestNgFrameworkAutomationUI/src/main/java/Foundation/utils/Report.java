@@ -26,7 +26,7 @@ public class Report {
     }
 
     public static void setTestName(String name){
-        test = extent.createTest(name + " " + TestSettings.browser);
+        test = extent.createTest(name);
     }
 
     public static void setResult(ITestResult result){

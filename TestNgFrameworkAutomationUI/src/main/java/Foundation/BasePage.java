@@ -1,8 +1,8 @@
 package Foundation;
 
+import Foundation.utils.WaitFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jetbrains.annotations.NotNull;
-import org.omg.CORBA.ORB;
 import org.openqa.selenium.*;
 import org.openqa.selenium.devtools.network.model.ConnectionType;
 import org.openqa.selenium.html5.*;
@@ -35,7 +35,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class BasePage extends Browser {
+//https://selenium.dev/selenium/docs/api/java/org/openqa/selenium/Dimension.html
+public class BasePage extends Browser{
 
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -62,23 +63,22 @@ public class BasePage extends Browser {
         return this;
     }
 
-    
-    public void click() {
-
+    protected WebElement findNestedElement(WebElement element, By locator){
+        return element.findElement(locator);
     }
 
-    protected void submit() {
+    protected  List<WebElement> findNestedElements(WebElement element, By locator){
+        return element.findElements(locator);
+    }
 
+    protected BasePage submit(By locator) {
+        findElement(locator).submit();
+        return this;
     }
 
     
-    public void sendKeys(CharSequence... keysToSend) {
-
-    }
-
-    
-    public void pressKey(CharSequence keyToPress) {
-
+    public void pressKe(By locator, CharSequence keyToPress) {
+        findElement(locator).sendKeys(keyToPress);
     }
 
     
@@ -86,8 +86,9 @@ public class BasePage extends Browser {
 
     }
 
-    protected void sendKeys(By locator, CharSequence... keysToSend) {
+    protected BasePage sendKeys(By locator, CharSequence... keysToSend) {
         waitForElementToBeClickable(locator).findElement(locator).sendKeys(keysToSend);
+        return this;
     }
 
     
@@ -145,8 +146,10 @@ public class BasePage extends Browser {
 
     }
 
-    protected String getText() {
-        return null;
+
+
+    protected String getText(WebElement element) {
+        return element.getText();
     }
 
     
@@ -155,19 +158,35 @@ public class BasePage extends Browser {
     }
 
     protected List<WebElement> findElements(By by) {
-        return null;
+        return driver.findElements(by);
     }
 
     protected WebElement findElement(By locator) {
         return driver.findElement(locator);
     }
 
-    protected boolean isDisplayed() {
-        return false;
+    protected boolean isDisplayed(WebElement element) {
+        return element.isDisplayed();
     }
 
-    protected Point getLocation() {
-        return null;
+    protected boolean isDisplayed(WebElement element, int timeout) {
+        new FluentWait(driver).withTimeout(Duration.ofSeconds(timeout)).ignoring(TimeoutException.class).until(ExpectedConditions.visibilityOf(element));
+        return isDisplayed(element);
+
+    }
+
+    protected boolean isDisplayed(By locator) {
+        return findElement(locator).isDisplayed();
+    }
+
+    protected boolean isDisplayed(By locator, int timeout) {
+        new FluentWait(driver).withTimeout(Duration.ofSeconds(timeout)).ignoring(TimeoutException.class).until(ExpectedConditions.visibilityOfElementLocated(locator));
+        return isDisplayed(locator);
+
+    }
+
+    protected Point getLocation(WebElement element) {
+        return element.getLocation();
     }
 
     protected String getPageSource() {
@@ -241,28 +260,82 @@ public class BasePage extends Browser {
         return null;
     }
 
-    protected void setSize(Dimension targetSize) {
-
+    protected BasePage setWindowPosition(Point targetPosition) {
+        driver.manage().window().setPosition(targetPosition);
+        return this;
     }
 
-    protected void setPosition(Point targetPosition) {
-
+    protected Rectangle getRect(WebElement element) {
+        return element.getRect();
     }
 
-    protected Dimension getSize() {
-        return null;
-    }
-
-    protected Rectangle getRect() {
-        return null;
+    protected Rectangle getRect(By locator) {
+        return getRect(findElement(locator));
     }
 
     protected String getCssValue(String propertyName) {
         return null;
     }
 
-    protected Point getPosition() {
-        return null;
+    protected Point getElementPosition(By locator) {
+        return findElement(locator).getLocation();
+    }
+    protected Point getElementPosition(WebElement element) {
+        return element.getLocation();
+    }
+
+    protected Dimension getElementDimension(By locator){
+        return getRect(locator).getDimension();
+    }
+
+    protected Dimension getElementDimension(WebElement element){
+        return getRect(element).getDimension();
+    }
+
+    protected int getElementHeight(By locator){
+        return getRect(locator).getHeight();
+    }
+
+    protected int getElementHeight(WebElement element){
+        return getRect(element).getHeight();
+    }
+
+
+    protected Point getElementPoint(By locator){
+        return getRect(locator).getPoint();
+    }
+
+    protected Point getElementPoint(WebElement element){
+        return getRect(element).getPoint();
+    }
+
+    protected int getElementWidth(By locator){
+        return getRect(locator).getWidth();
+    }
+
+    protected int getElementWidth(WebElement element){
+        return getRect(element).getWidth();
+    }
+
+    protected int getElementX(By locator){
+        return getRect(locator).getX();
+    }
+
+    protected int getElementX(WebElement element){
+        return getRect(element).getX();
+    }
+    protected int getElementY(By locator){
+        return getRect(locator).getY();
+    }
+
+    protected int getElementY(WebElement element){
+        return getRect(element).getY();
+    }
+
+
+
+    protected Point getWindowPosition() {
+        return driver.manage().window().getPosition();
     }
 
     protected <X> X getScreenshotAs(OutputType<X> target) throws WebDriverException {
@@ -271,6 +344,16 @@ public class BasePage extends Browser {
 
     protected BasePage waitForElementToBeClickable(By locator){
         wait.until(ExpectedConditions.elementToBeClickable(locator));
+        return this;
+    }
+
+    protected BasePage waitForUrlToChange(String urlBefore){
+        wait.until(WaitFor.waitForUrlToChange(urlBefore));
+        return this;
+    }
+
+    protected BasePage waitForNestedElementToBeInDOM(WebElement parent, By child){
+        wait.until(WaitFor.waitForNestedElementToBeIdDom(parent, child));
         return this;
     }
 
@@ -398,16 +481,6 @@ public class BasePage extends Browser {
     }
 
     
-    public void to(String url) {
-
-    }
-
-    
-    public void to(URL url) {
-
-    }
-
-    
     public WebDriver.Timeouts implicitlyWait(long time, TimeUnit unit) {
         return null;
     }
@@ -505,11 +578,6 @@ public class BasePage extends Browser {
     
     public void printCommandHelp(PrintStream out, boolean helpType) {
 
-    }
-
-    
-    public boolean processCommand(String[] cmd, ORB orb, PrintStream out) {
-        return false;
     }
 
     
@@ -649,7 +717,15 @@ public class BasePage extends Browser {
 
     
     public void move(int x, int y) {
+        /**
+         * TODO - find the current coursor and move to new location
+         */
+        new Point(x, y).move(x,y);
+    }
 
+    protected BasePage moveBy(WebElement element,int xOffset, int yOffset){
+        getElementPosition(element).moveBy(xOffset, yOffset);
+        return this;
     }
 
     

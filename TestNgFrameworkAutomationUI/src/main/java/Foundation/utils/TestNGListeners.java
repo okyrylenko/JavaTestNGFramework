@@ -1,12 +1,20 @@
 package Foundation.utils;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.events.WebDriverEventListener;
 import org.testng.*;
-import org.testng.annotations.ITestAnnotation;
+import org.testng.annotations.*;
+import org.testng.internal.IResultListener;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-public class TestNGListeners implements ITestListener, ISuiteListener, IExecutionListener, IInvokedMethodListener, IAnnotationTransformer{
+//AbstractWebDriverEventListener
+public class TestNGListeners implements ITestListener, ISuiteListener, IExecutionListener, IInvokedMethodListener, IAnnotationTransformer,IConfigurationListener,
+        IResultListener, ITestNGListener{
 
     public void onTestStart(ITestResult result) {
         System.out.println("Test '" + result.getName() + "' started");
@@ -57,14 +65,15 @@ public class TestNGListeners implements ITestListener, ISuiteListener, IExecutio
         System.out.println("On execution finish");
     }
 
-    public void beforeInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-        System.out.println("method '" + method.getTestMethod().getMethodName() + "' in '"+ context.getName()+"' starting");
+    public void onConfigurationSuccess(ITestResult itr) {
     }
 
-    public void afterInvocation(IInvokedMethod method, ITestResult testResult, ITestContext context) {
-        System.out.println("method '" + method.getTestMethod().getMethodName() + "' in '"+ context.getName()+"' finished");
+    public void onConfigurationFailure(ITestResult itr) {
     }
 
+    public void onConfigurationSkip(ITestResult itr) {
+    }
 
-
+    public void beforeConfiguration(ITestResult tr) {
+    }
 }

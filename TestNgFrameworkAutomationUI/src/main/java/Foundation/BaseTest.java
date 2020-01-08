@@ -2,41 +2,34 @@ package Foundation;
 
 import Foundation.Enums.Browsers;
 import Foundation.Enums.Environments;
+import Foundation.utils.DriverListener;
 import Foundation.utils.Report;
-import UIComponents.LogInPage;
-import com.aventstack.extentreports.ExtentReporter;
-import com.aventstack.extentreports.ExtentReports;
-import com.aventstack.extentreports.ExtentTest;
-import com.google.inject.Inject;
+import Foundation.utils.ThreadManager;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.apache.commons.io.FilenameUtils;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.DriverManager;
 import java.util.Properties;
 
 
 public class BaseTest {
-
-    public WebDriver driver;
-    public WebDriverWait wait;
     private Properties props;
 
+
     @BeforeSuite(alwaysRun = true)
-    @Parameters({"Env"})
-    public void beforeSuite(ITestContext context, @Optional("Production") String env) throws IOException {
-        TestSettings.env = Environments.valueOf(env);
-        TestSettings.baseUrl = getValueForProperty(TestSettings.env+".baseUrl");
-        Report.start(context.getName());
+    public void beforeSuite(ITestContext context) {
+        Report.start(context.getCurrentXmlTest().getSuite().getName());
     }
 
     @BeforeTest(alwaysRun = true)
@@ -55,31 +48,40 @@ public class BaseTest {
 
 
     @BeforeMethod(alwaysRun = true)
-    @Parameters({"Browser"})
-    public void beforeMethod(@Optional("Chrome") String browser,ITestResult result){
-        TestSettings.browser = Browsers.valueOf(browser);
-        System.out.println("opening " + TestSettings.browser +" on  thread " + Thread.currentThread().getId());
-        Report.setTestName(result.getMethod().getMethodName());
-        switch (TestSettings.browser){
+    @Parameters({"Browser", "Env"})
+    public void beforeMethod(@Optional("Chrome") String browser, String env, ITestResult result, ITestContext context) throws IOException {
+        ThreadManager.setSettings(new TestSettings());
+        ThreadManager.getSettings()
+                .setEnv(Environments.valueOf(env));
+        ThreadManager.getSettings()
+                .setBaseUrl(getValueForProperty( ThreadManager.getSettings().getEnv().toString() +".baseUrl"))
+                .setBrowser(Browsers.valueOf(browser));
+        System.out.println("opening " + ThreadManager.getSettings().getBrowser().toString() +" on  thread " + Thread.currentThread().getId());
+        Report.setTestName(result.getMethod().getMethodName() + "_" + ThreadManager.getSettings().getBrowser().toString());
+        switch (ThreadManager.getSettings().getBrowser()){
             case Chrome:
                 WebDriverManager.chromedriver().setup();
-                driver = new ChromeDriver();
+                ThreadManager.setDriver(new ChromeDriver());
                 break;
             case Firefox:
                 WebDriverManager.firefoxdriver().setup();
-                driver = new FirefoxDriver();
+                ThreadManager.setDriver(new FirefoxDriver());
                 break;
         }
 
-        wait = new WebDriverWait(driver,5);
+        ThreadManager.setWait(new WebDriverWait(ThreadManager.getDriver(), 5));
 
-        driver.manage().window().maximize();
+        ThreadManager.getDriver().manage().window().maximize();
+
+        EventFiringWebDriver eventDriver = new EventFiringWebDriver(ThreadManager.getDriver());
+        DriverListener listeners = new DriverListener();
+        eventDriver.register(listeners);
     }
 
     @AfterMethod(alwaysRun = true)
     public void afterMethod(ITestResult result){
         Report.setResult(result);
-        driver.quit();
+        ThreadManager.getDriver().quit();
     }
 
     @AfterClass(alwaysRun = true)

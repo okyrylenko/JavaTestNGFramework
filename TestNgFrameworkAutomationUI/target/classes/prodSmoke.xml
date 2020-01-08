@@ -7,12 +7,11 @@
     <parameter name="Env" value="Production"></parameter>
 
     <!-- Test level-->
-    <test name="Prod-Smoke-Chrome" >
+    <test name="Prod-Smoke-Chrome" parallel="methods">
         <parameter name="Browser" value="Chrome"/>
         <groups>
             <run>
                 <include name="smoke">
-
                 </include>
             </run>
         </groups>
@@ -22,7 +21,7 @@
         </classes>
     </test>
 
-    <test name="Prod-Smoke-FireFox" >
+    <test name="Prod-Smoke-FireFox" parallel="methods" >
         <parameter name="Browser" value="Firefox"></parameter>
         <groups>
             <run>

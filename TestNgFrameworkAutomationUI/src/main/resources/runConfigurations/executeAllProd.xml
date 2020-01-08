@@ -1,13 +1,13 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
 
-<suite name="ExecuteAllProd" verbose="1" parallel="tests" thread-count="7" >
+<suite name="ExecuteAllProd" verbose="1" parallel="tests" thread-count="2" >
+    <parameter name="Env" value="Production"></parameter>
     <listeners>
         <listener class-name="Foundation.utils.TestNGListeners"></listener>
     </listeners>
-    <parameter name="Env" value="Production"></parameter>
 
     <!-- Test level-->
-    <test name="Production-Chrome" >
+    <test name="Production-Chrome" parallel="methods" thread-count="1" >
         <parameter name="Browser" value="Chrome"/>
         <classes>
             <class name="LogIn" />
@@ -15,7 +15,7 @@
         </classes>
     </test>
 
-    <test name="Production-FireFox" >
+    <test name="Production-FireFox" parallel="methods" thread-count="1">
         <parameter name="Browser" value="Firefox"></parameter>
         <classes>
             <class name="LogIn" />

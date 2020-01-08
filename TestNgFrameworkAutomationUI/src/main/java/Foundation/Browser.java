@@ -1,22 +1,29 @@
 package Foundation;
 
+import Foundation.utils.ThreadManager;
+import com.google.inject.internal.cglib.core.$CollectionUtils;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import java.net.URL;
 import org.openqa.selenium.WindowType;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.Date;
 import java.util.Set;
 
+//https://selenium.dev/selenium/docs/api/java/org/openqa/selenium/Dimension.html
 public class Browser {
 
     private final WebDriver driver;
     private final WebDriverWait wait;
+    private TestSettings settings;
 
     //@Inject
     public Browser(WebDriver driver, WebDriverWait wait) {
         this.driver = driver;
         this.wait = wait;
+        this.settings = new TestSettings();
     }
 
     public String getCurrentUrl() {
@@ -80,6 +87,45 @@ public class Browser {
         return driver.manage().getCookieNamed(name);
     }
 
+    public Browser setCookie(Cookie cookie){
+        driver.manage().addCookie(cookie);
+        return this;
+    }
+
+    public Browser setCookie(String name, String value, String path, String domain, Date date, boolean secure, boolean httpOnly){
+        Cookie cookie = new Cookie.Builder(name, value)
+                .domain(domain)
+                .expiresOn(date)
+                .isSecure(secure)
+                .isHttpOnly(httpOnly)
+                .build();
+        this.setCookie(cookie);
+        return this;
+    }
+
+    protected Browser setSize(Dimension targetSize) {
+        driver.manage().window().setSize(targetSize);
+        return this;
+    }
+
+    protected Browser setSize(int x, int y) {
+        this.setSize(new Dimension(x, y));
+        return this;
+    }
+
+    protected Dimension getSize(){
+        return driver.manage().window().getSize();
+    }
+
+    protected int getBrowserHeight(){
+        return this.getSize().getHeight();
+    }
+
+    protected int getBrowserWidth(){
+        return this.getSize().getWidth();
+    }
+
+
     public void get(String relativeUrl){
         navigateTo(relativeUrl);
     }
@@ -93,7 +139,8 @@ public class Browser {
     }
 
     public void navigateTo(String relativeUrl) {
-        String url = TestSettings.baseUrl + relativeUrl;
+        String url = ThreadManager.getSettings().getBaseUrl() + relativeUrl;
+        System.out.println("url is " + url);
         driver.navigate().to(url);
     }
 
@@ -129,4 +176,8 @@ public class Browser {
     public void fullscreen() {
         driver.manage().window().fullscreen();
     }
+
+
+    //-------------------------------Browser Configurations----------------//
+
 }

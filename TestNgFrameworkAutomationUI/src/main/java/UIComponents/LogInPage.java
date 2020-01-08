@@ -22,8 +22,8 @@ public final class LogInPage extends BasePage {
     private final By btnSignIn = locateElementByCss("input[name='commit']");
 
     public LogInPage logIn(Account account){
-        this.enterEmail(account.email);
-        this.enterPassword(account.password);
+        this.enterEmail(account.getEmail());
+        this.enterPassword(account.getPassword());
         this.clickSingIn();
         return this;
     }
